@@ -1,16 +1,43 @@
-# This is a sample Python script.
+import pickle
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from flask import Flask, request
+import pandas as pd
+import xgboost
+
+# Carrega o modelo a ser usado
+xgb = xgboost.XGBClassifier()
+xgb.load_model('modelos//model_xgboost')
+
+with open('modelos//randomforest_pickled', 'rb') as f:
+  rdf = pickle.load(f)
+
+app = Flask(__name__)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+@app.route('/xgboost', methods=['GET'])
+def xgboost():
+    content = request.json
+    pred_test = str(xgb.predict(pd.DataFrame.from_dict([dict(content)]))[0])
+    if pred_test == "1":
+        json_resp = {"diabetes": "sim", "code": 1}
+    else:
+        json_resp = {"diabetes": "nao", "code": 0}
+    json_resp['estimator'] = "XGBoost Classifier"
+    return json_resp
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+@app.route('/rdf', methods=['GET'])
+def randomforestclassifier():
+    content = request.json
+    pred_test = str(rdf.predict(pd.DataFrame.from_dict([dict(content)]))[0])
+    if pred_test == "1":
+        json_resp = {"diabetes": "sim", "code": 1}
+    else:
+        json_resp = {"diabetes": "nao", "code": 0}
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    json_resp['estimator'] = "Random Forest Classifier"
+    return json_resp
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
