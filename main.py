@@ -1,42 +1,63 @@
-import pickle
-
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import pandas as pd
-import xgboost
+from werkzeug.exceptions import abort
 
-# Carrega o modelo a ser usado
-xgb = xgboost.XGBClassifier()
-xgb.load_model('modelos//model_xgboost')
+from modelos.modelos import XGBoost, RandomForest
+from modelos.utils import resquest_conversors, MODELOS
 
-with open('modelos//randomforest_pickled', 'rb') as f:
-  rdf = pickle.load(f)
+"""Instanciando os modelos"""
+xgb = XGBoost()
+rdf = RandomForest()
 
+"""Instância do Flask"""
 app = Flask(__name__)
 
 
-@app.route('/xgboost', methods=['GET'])
+@app.errorhandler(404)
+def resource_not_found(e):
+    return jsonify(error=str(e)), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    return {"erro": "Dados invalidos"}
+
+
+@app.route(f'/{MODELOS[0]}', methods=['POST'])
 def xgboost():
-    content = request.json
-    pred_test = str(xgb.predict(pd.DataFrame.from_dict([dict(content)]))[0])
-    if pred_test == "1":
-        json_resp = {"diabetes": "sim", "code": 1}
-    else:
-        json_resp = {"diabetes": "nao", "code": 0}
-    json_resp['estimator'] = "XGBoost Classifier"
-    return json_resp
+    try:
+        content = request.json
+        content_convertido = resquest_conversors(dict(content))
+        pred_test = str(xgb.predict(pd.DataFrame.from_dict([content_convertido]))[0])
+        if pred_test == "1":
+            json_resp = {"diabetes": "sim", "code": 1}
+        else:
+            json_resp = {"diabetes": "nao", "code": 0}
+        json_resp['estimator'] = "XGBoost Classifier"
+        return json_resp
+    except:
+        abort(500)
 
 
-@app.route('/rdf', methods=['GET'])
-def randomforestclassifier():
-    content = request.json
-    pred_test = str(rdf.predict(pd.DataFrame.from_dict([dict(content)]))[0])
-    if pred_test == "1":
-        json_resp = {"diabetes": "sim", "code": 1}
-    else:
-        json_resp = {"diabetes": "nao", "code": 0}
+@app.route(f'/{MODELOS[1]}', methods=['POST'])
+def random_forest_classifier():
+    try:
+        content = request.json
+        content_convertido = resquest_conversors(dict(content))
+        pred_test = str(rdf.predict(pd.DataFrame.from_dict([content_convertido]))[0])
+        if pred_test == "1":
+            json_resp = {"diabetes": "sim", "code": 1}
+        else:
+            json_resp = {"diabetes": "nao", "code": 0}
+        json_resp['estimator'] = "Random Forest Classifier"
+        return json_resp
+    except:
+        abort(500)
 
-    json_resp['estimator'] = "Random Forest Classifier"
-    return json_resp
+
+@app.route('/modelos', methods=['GET'])
+def get_models():
+    return {'modelos': MODELOS}
 
 
 if __name__ == "__main__":
