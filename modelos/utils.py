@@ -18,7 +18,7 @@ def resquest_conversors(dic: dict) -> Union[Type[Exception], dict]:
             return Exception
 
     """Calcula IMC"""
-    dic['imc'] = round(dic['peso'] / (dic['altura']**2), 1)
+    dic['imc'] = round(dic['peso'] / (dic['altura'] ** 2), 1)
 
     """Converte kilos para libras"""
     dic['peso'] = int(float(dic['peso']) * 2.20462262185)
@@ -44,5 +44,9 @@ def resquest_conversors(dic: dict) -> Union[Type[Exception], dict]:
     """Converte a cintura de centimetros para inches"""
     dic['cintura'] = round(dic['cintura'] / 2.54, 0)
 
-    return dic
-
+    """Reorganizar o dicionário recebido para ficar igual ao DataFrame do modelo"""
+    response_dict = {'colesterol_ruim': dic['colesterol_ruim'], 'glucose': dic['glucose'],
+                     'colesterol_bom': dic['colesterol_bom'], 'idade': dic['idade'], 'peso': dic['peso'],
+                     'cintura': dic['cintura'], 'imc': dic['imc'], 'pressão_sistolica': dic['pressão_sistolica'],
+                     'pressão_diastolica': dic['pressão_diastolica']}
+    return response_dict

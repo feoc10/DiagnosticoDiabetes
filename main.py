@@ -28,12 +28,14 @@ def xgboost():
     try:
         content = request.json
         content_convertido = resquest_conversors(dict(content))
+        print(content_convertido)
         pred_test = str(xgb.predict(pd.DataFrame.from_dict([content_convertido]))[0])
         if pred_test == "1":
             json_resp = {"diabetes": "sim", "code": 1}
         else:
             json_resp = {"diabetes": "nao", "code": 0}
         json_resp['estimator'] = "XGBoost Classifier"
+        print(json_resp)
         return json_resp
     except:
         abort(500)
@@ -44,12 +46,14 @@ def random_forest_classifier():
     try:
         content = request.json
         content_convertido = resquest_conversors(dict(content))
+        print(content_convertido)
         pred_test = str(rdf.predict(pd.DataFrame.from_dict([content_convertido]))[0])
         if pred_test == "1":
             json_resp = {"diabetes": "sim", "code": 1}
         else:
             json_resp = {"diabetes": "nao", "code": 0}
         json_resp['estimator'] = "Random Forest Classifier"
+        print(json_resp)
         return json_resp
     except:
         abort(500)

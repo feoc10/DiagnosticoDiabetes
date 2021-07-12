@@ -6,5 +6,6 @@
 - [X] Converter o valor da cintura de centimetros para inches.
   
 ## Fora do servidor (back-end)
-- [ ] Fazer um aplicativo que acessa esse backend e recebe o retorno previsto.
+- [X] Fazer um aplicativo que acessa esse backend e recebe o retorno previsto.
+- [ ] Fazer fomulário no aplicativo
 - [ ] Solicitar Peso e altura.
