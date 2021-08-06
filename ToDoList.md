@@ -7,5 +7,5 @@
   
 ## Fora do servidor (back-end)
 - [X] Fazer um aplicativo que acessa esse backend e recebe o retorno previsto.
-- [ ] Fazer fomulário no aplicativo
-- [ ] Solicitar Peso e altura.
+- [X] Fazer fomulário no aplicativo
+- [X] Solicitar Peso e altura.
